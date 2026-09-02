@@ -1,0 +1,24 @@
+[Unit]
+Description=ledwall - camera-driven LED matrix over DDP
+Documentation=https://github.com/adman234/claude-unraid-docker/tree/main/led-wall
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@USER@
+SupplementaryGroups=video
+ExecStart=@PREFIX@/venv/bin/ledwall run -c @CONFIG@
+Restart=always
+RestartSec=3
+# The render loop is soft-realtime; a small priority boost keeps frame timing
+# steady on a Pi 3B+ without starving anything else.
+Nice=-5
+# Give the camera time to enumerate on a cold boot before we give up.
+TimeoutStartSec=30
+KillSignal=SIGTERM
+# SIGTERM makes ledwall blank the wall before exiting; allow time for that.
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

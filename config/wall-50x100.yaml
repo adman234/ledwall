@@ -1,0 +1,65 @@
+# ledwall - 50 x 100 wall (5,000 RGBW pixels)
+#
+# Strips run horizontally: 50 runs of 100 pixels, serpentine.
+# Two 4-output WLED controllers, 25 runs each -> 2,500 LEDs per controller.
+# Run `ledwall buses -c <this file>` to get the numbers to type into WLED.
+
+grid:
+  width: 100
+  height: 50
+
+output:
+  fps: 30
+  brightness: 0.35        # master cap. 5,000 RGBW pixels at 1.0 is ~1.2 kW.
+  gamma: 2.2
+  rgbw: true
+  white_mode: accurate    # none | min | accurate
+  white_gain: 1.0
+
+wiring:
+  orientation: rows       # strips run along the long axis
+  start_corner: top-left  # where run 0 begins, and which way it travels
+  serpentine: true
+  serpentine_scope: output   # each output starts at the same edge
+  controllers:
+    - name: wall-a
+      host: 192.168.1.51
+      lines: [0, 25]      # grid rows 0..24
+      outputs: 4          # split evenly -> 7,6,6,6 runs (700,600,600,600 LEDs)
+    - name: wall-b
+      host: 192.168.1.52
+      lines: [25, 50]     # grid rows 25..49
+      outputs: 4
+
+camera:
+  device: 0
+  width: 640
+  height: 480
+  fps: 30
+  fourcc: MJPG            # USB webcams: MJPG is far cheaper than YUYV on a Pi
+  backend: auto           # auto | v4l2 | picamera2 | any
+  mirror: true            # mirror so the wall behaves like a mirror
+  rotate: 0
+
+source:
+  kind: person            # person | motion | pattern
+  backend: auto           # auto | mediapipe | tflite | mog2
+  infer_fps: 12           # segmentation rate; output still runs at output.fps
+  infer_size: 256
+  threshold: 0.5
+  smoothing: 0.5          # temporal blend of successive masks (0 = none)
+
+render:
+  palette: aurora         # aurora | ember | ice | rainbow | white | magma
+  mode: fill              # fill | outline | glow
+  cycle_seconds: 24
+  trail: 0.0              # 0 = crisp, 0.8 = long comet trails
+  background: dim
+  background_level: 0.04
+
+web:
+  enabled: true
+  host: 0.0.0.0
+  port: 8080
+  preview_scale: 6
+  jpeg_quality: 70

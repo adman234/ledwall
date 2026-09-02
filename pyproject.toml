@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ledwall"
+version = "0.1.0"
+description = "Camera-driven person tracking onto a large WLED matrix over DDP"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.21",
+    "opencv-python-headless>=4.6",
+    "PyYAML>=5.4",
+]
+
+[project.optional-dependencies]
+# Best segmentation quality. Needs 64-bit OS: wheels are manylinux_2_28_aarch64,
+# there is no 32-bit armv7l build.
+vision = ["mediapipe>=0.10"]
+# Lighter alternative: run the same model through LiteRT directly.
+lite = ["ai-edge-litert>=1.0"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+ledwall = "ledwall.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["ledwall*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
