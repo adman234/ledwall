@@ -35,7 +35,7 @@ There are four sensible ways out and that section lays them out.
 On a Raspberry Pi running **64-bit** Raspberry Pi OS (Bookworm recommended):
 
 ```bash
-git clone <this repo> && cd led-wall
+git clone https://github.com/adman234/ledwall.git && cd ledwall
 sudo ./scripts/install.sh
 ```
 
