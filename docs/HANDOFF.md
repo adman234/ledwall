@@ -1,4 +1,4 @@
-# ledwall — project handoff
+# ledwall: project handoff
 
 Everything needed to pick this project up cold, in a new repo or a new
 session. Written for whoever (or whatever) continues the work.
@@ -43,10 +43,10 @@ and model paths are written carefully but are unproven. `ledwall doctor` and
 
 ## 2. Hardware decisions (these drove the software)
 
-### 2.1 The pitch problem — the single most important finding
+### 2.1 The pitch problem: the single most important finding
 
 A 4 × 8 ft sheet is 1219 × 2438 mm. A 50 × 100 grid is the same 1:2 ratio, so
-square pixels filling it exactly need a pitch of **1219 ÷ 50 = 24.4 mm** —
+square pixels filling it exactly need a pitch of **1219 ÷ 50 = 24.4 mm**:
 about 41 LEDs/m. **That density does not exist.**
 
 Pitch *along* a strip is fixed by the strip you buy; only *row spacing* is
@@ -58,17 +58,17 @@ off-the-shelf strip. The four ways out:
 | A | 60/m, rows on 16.7 mm | 50 × 100 | 833 × 1667 mm (32.8 × 65.6″) | 5,000 | `1.0` |
 | **B** | 60/m, rows on 24.4 mm | 50 × 100 | 1219 × 1667 mm (48 × 65.6″) | 5,000 | `0.683` |
 | C | 30/m, rows on 33.3 mm | 36 × 73 | full sheet | 2,628 | `1.0` |
-| D | 60/m filling the sheet | 73 × 146 | full sheet | 10,658 | — |
+| D | 60/m filling the sheet | 73 × 146 | full sheet | 10,658 | - |
 
-**B is the recommendation** — fills the full 4 ft width with the same 5,000
+**B is the recommendation**: fills the full 4 ft width with the same 5,000
 pixels. Its pixels are taller than wide, which is why `grid.pixel_aspect`
 exists: it makes the camera crop match the wall's *physical* aspect so people
-aren't vertically squashed. D is ~2.6 kW and 42 Mbit/s — don't.
+aren't vertically squashed. D is ~2.6 kW and 42 Mbit/s: don't.
 
 ### 2.2 Strip: WS2814, 12 V, RGBW, 60/m
 
 * 5,000 SK6812 RGBW at **5 V is ~300 A** at full white. At 12 V it's ~100 A.
-* WS2814 has a **backup data line** — one dead LED doesn't kill the run. At
+* WS2814 has a **backup data line**: one dead LED doesn't kill the run. At
   5,000 pixels and ~200 hand-soldered joints this matters more than anything.
 * ⚠️ Some 12 V RGBW strips address LEDs **in groups of three**. A "60/m" strip
   like that gives 20 controllable pixels/m, not 60. Verify before buying.
@@ -101,16 +101,16 @@ WLED drives outputs in parallel, so the ceiling is set by the *longest* chain.
 8 × 625 px is what makes 30 fps comfortable.
 
 Network: 20,000 bytes/frame, 4.8 Mbit/s at 30 fps, 7 DDP packets per frame per
-controller. **Use Ethernet** — an ESP32 on Wi-Fi drops packets at this rate and
+controller. **Use Ethernet**: an ESP32 on Wi-Fi drops packets at this rate and
 a dropped DDP packet is a visible band of stale pixels.
 
 ### 2.5 Rolling
 
 LED strip bends along its length, not across its width. So **strips must run
-parallel to the long axis and you roll along that same axis** — 150 mm core,
+parallel to the long axis and you roll along that same axis**: 150 mm core,
 strips run along the 8 ft direction, roll the 8 ft direction up. Roll lit-side
 out. Flexible silicone jumpers with service loops; stagger them between rows.
-Strip adhesive alone fails after a few roll cycles — add mechanical retention
+Strip adhesive alone fails after a few roll cycles: add mechanical retention
 every ~300 mm.
 
 ---
@@ -119,7 +119,7 @@ every ~300 mm.
 
 Researched during the build; don't re-derive these.
 
-**DDP wire format** — read from WLED source, not guessed. Receiver is
+**DDP wire format**: read from WLED source, not guessed. Receiver is
 `wled00/e131.cpp` → `handleDDPPacket`; constants in
 `wled00/src/dependencies/e131/ESPAsyncE131.h`:
 
@@ -139,7 +139,7 @@ Two details that bite:
   have an RGBW **bus type** configured or the data is misinterpreted.
 * WLED renders on the PUSH flag. Set it **only on a frame's last packet**, or
   it renders 7× per frame.
-* WLED rejects a packet whose declared length exceeds what arrived — hence the
+* WLED rejects a packet whose declared length exceeds what arrived: hence the
   1440-byte payload cap (divisible by both 3 and 4).
 
 **Segmentation runtime availability on Raspberry Pi:**
@@ -150,7 +150,7 @@ Two details that bite:
 | `ai-edge-litert` 2.2.0 | `manylinux_2_27_aarch64` only | 64-bit only, works on Bullseye |
 | `tflite-runtime` 2.14.0 | `manylinux_2_34` aarch64 **and armv7l** | only ML option on 32-bit; needs Bookworm (glibc ≥ 2.34) |
 
-`mediapipe` depends on **`opencv-contrib-python`** — the GUI build. It replaces
+`mediapipe` depends on **`opencv-contrib-python`**: the GUI build. It replaces
 headless OpenCV and then fails on a headless Pi with
 `libGL.so.1: cannot open shared object file`. The installer force-reinstalls
 `opencv-contrib-python-headless` afterwards to repair this.
@@ -168,7 +168,7 @@ handles both 1-channel sigmoid and 2-channel softmax outputs.
 ledwall/
   config.py        YAML -> validated dataclasses. Rejects overlapping
                    controllers, unassigned strip runs, bad output splits,
-                   unknown keys — each with a message naming the problem.
+                   unknown keys: each with a message naming the problem.
   geometry.py      Wiring -> per-controller numpy gather array `take`, where
                    take[i] is the flat grid index feeding LED i. Verifies the
                    map is exactly one-to-one before anything is sent.
@@ -202,7 +202,7 @@ tests/                    35 tests
 
 **Gather arrays, not loops.** The wiring config compiles once into
 `take[i] = flat grid index`. Sending a frame is one numpy fancy-index per
-controller — ~0.1 ms for 5,000 px instead of a Python loop.
+controller: ~0.1 ms for 5,000 px instead of a Python loop.
 
 **Three decoupled rates.** Segmentation is ~10× more expensive than everything
 else. Rather than letting it set the wall's frame rate, it runs slower
@@ -212,7 +212,7 @@ each new mask (`source.smoothing`). This is what makes a 3B+ viable.
 **Gamma last.** Colour maths in linear float, then the RGB→RGBW split, then
 brightness, then gamma. Gamma-correcting before the white split skews hues.
 `white_mode: accurate` moves the achromatic component onto the white die and
-subtracts it from RGB — preserves hue and is far more efficient than making
+subtracts it from RGB: preserves hue and is far more efficient than making
 white from three coloured dies.
 
 **Headless by design.** No `cv2.imshow`. The original inspiration ran on a
@@ -231,7 +231,7 @@ grid:
 
 output:
   fps: 30
-  brightness: 0.35         # master cap — 5,000 RGBW at 1.0 is ~1.2 kW
+  brightness: 0.35         # master cap: 5,000 RGBW at 1.0 is ~1.2 kW
   gamma: 2.2
   rgbw: true
   white_mode: accurate     # none | min | accurate
@@ -246,7 +246,7 @@ wiring:
     - name: wall-a
       host: 192.168.1.51
       port: 4048
-      lines: [0, 25]       # [start, end) — this controller owns runs 0..24
+      lines: [0, 25]       # [start, end): this controller owns runs 0..24
       outputs: 4           # int (split evenly) or list of per-output counts
 
 camera:   { device: 0, width: 640, height: 480, fps: 30, fourcc: MJPG,
@@ -260,7 +260,7 @@ web:      { enabled: true, host: 0.0.0.0, port: 8080,
 ```
 
 `source.kind`: `person` (segmentation) | `motion` (background subtraction,
-static camera) | `pattern` (animated blob, no camera — commission the wall
+static camera) | `pattern` (animated blob, no camera: commission the wall
 before the camera works).
 
 ---
@@ -277,7 +277,7 @@ ledwall map --by output            # one output at a time, named as it goes
 sudo systemctl start ledwall
 ```
 
-`map` and `test` are the ones that save real time — a 5,000-pixel wall *will*
+`map` and `test` are the ones that save real time: a 5,000-pixel wall *will*
 have a reversed serpentine or a swapped output somewhere, and finding it by
 staring at a person-shaped blob is miserable.
 
@@ -287,7 +287,7 @@ staring at a person-shaped blob is miserable.
 | Every other row reversed | `serpentine` / `serpentine_scope` |
 | Mirrored or upside down | `start_corner` |
 | One output dark | wrong GPIO, or Start/Count ≠ `ledwall buses` |
-| Bands of stale pixels when moving | dropped DDP packets — get off Wi-Fi |
+| Bands of stale pixels when moving | dropped DDP packets: get off Wi-Fi |
 | Far end of a run dims to red | power injection, not data |
 
 ---
@@ -298,9 +298,9 @@ staring at a person-shaped blob is miserable.
    `ledwall doctor` and `ledwall bench --segment` on the Pi first.
 2. **Pi 3B+ segmentation rate is an estimate.** I predicted 8–15 fps for the
    256×256 selfie segmenter on 4×A53; not measured. Render + wiring measured
-   0.8 ms/frame for 5,000 px on x86-64 — expect 5–12 ms on a Pi, against a
+   0.8 ms/frame for 5,000 px on x86-64: expect 5–12 ms on a Pi, against a
    33 ms budget, so that part is not the bottleneck.
-3. **`ledwall map --by output` is untested against real hardware** — the
+3. **`ledwall map --by output` is untested against real hardware**: the
    payload construction is unit-tested but the visual result isn't.
 4. **No multi-person handling.** The selfie segmenter returns one foreground
    mask; two people merge into one blob. Fine for the effect, worth knowing.
@@ -308,20 +308,13 @@ staring at a person-shaped blob is miserable.
    discovery would be a nice addition.
 6. **`motion` (MOG2) mode needs a static camera** and a few seconds to learn
    the background. There's a `reset()` but nothing calls it on scene change.
-7. Consider an idle/attract mode when nobody has been detected for a while —
+7. Consider an idle/attract mode when nobody has been detected for a while:
    `render.background: idle` is a stub in that direction.
 
 ---
 
-## 8. Provenance
+## 8. More
 
-Built in a Claude Code session that was, mistakenly, pointed at an unrelated
-repo (`adman234/claude-unraid-docker`). That project was never pushed and the
-repo has been restored to its original state — this code has no history there.
-This is a clean, standalone project.
-
-`docs/BUILD.md` has the long-form version of §2, and there is an illustrated
-build guide at
-https://claude.ai/code/artifact/0d9be010-0f55-408a-b732-328539fe489e
+`docs/BUILD.md` has the long-form version of section 2.
 
 Licence: MIT.

@@ -4,12 +4,12 @@ One-time setup per controller. Do this before running ledwall.
 
 ## 1. Flash and network
 
-1. Flash WLED (https://install.wled.me) — use an **ESP32** build, not ESP8266.
+1. Flash WLED (https://install.wled.me): use an **ESP32** build, not ESP8266.
    An ESP8266 cannot move 2,500 pixels of DDP.
 2. Join it to your network. **Prefer Ethernet.** If the board has an Ethernet
    PHY, set *Config → WiFi Setup → Ethernet Type* to match it (e.g. `WT32-ETH01`,
    `QuinLED-Dig-Octa`, `ESP32-POE`).
-3. Give each controller a **static IP or DHCP reservation** — ledwall addresses
+3. Give each controller a **static IP or DHCP reservation**: ledwall addresses
    them by IP, and a lease change means a dark wall.
 
 ## 2. LED outputs
@@ -28,7 +28,7 @@ $ ledwall buses
 
 In *Config → LED Preferences*, for each output add one bus:
 
-* **Type:** `SK6812 / WS2814 RGBW` (a 4-channel type — this matters, see below)
+* **Type:** `SK6812 / WS2814 RGBW` (a 4-channel type: this matters, see below)
 * **Color Order:** whatever your strip is, usually GRB. Get it right with the
   `ledwall test solid` pattern before you trust anything else.
 * **Start** and **Count:** copy from the table above.
@@ -42,7 +42,7 @@ JSON API and tells you if it disagrees with your config.
 
 ledwall sends DDP data type `0x1B` (RGBW, 4 channels) when `output.rgbw: true`.
 WLED only interprets that as 4-channel if its bus type is an RGBW one. If the
-bus is configured RGB, the colours will be scrambled and shifted — every pixel
+bus is configured RGB, the colours will be scrambled and shifted: every pixel
 reading one byte off from the last. If you are on RGB strip instead, set
 `output.rgbw: false` in your config and ledwall sends `0x0B` (RGB) instead.
 
@@ -55,7 +55,7 @@ Enable it and set:
 * **mA per LED:** `20` for 12 V WS2814 (see the power section in
   [BUILD.md](BUILD.md)).
 * **Max current:** the amperage actually available to that controller's
-  share of the wall, with margin — e.g. `15000` mA per controller if you have
+  share of the wall, with margin: e.g. `15000` mA per controller if you have
   two 29 A supplies feeding four zones each.
 
 WLED's limiter is calibrated around 5 V strip, so on 12 V strip treat it as a
@@ -72,7 +72,7 @@ real limit is `output.brightness` in your ledwall config.
   black frame on shutdown, so the wall goes dark cleanly rather than freezing
   on the last image.
 * Turn **off** "Receive UDP notifications" between the two controllers if you
-  have them syncing to each other — ledwall drives each one independently and
+  have them syncing to each other: ledwall drives each one independently and
   cross-sync will fight it.
 
 ## 5. Verifying
@@ -94,5 +94,5 @@ Common results and what they mean:
 | Image mirrored or upside down | `wiring.start_corner` |
 | One output dark | wrong GPIO, or Start/Count not matching `ledwall buses` |
 | Outputs in the wrong order | reorder the `outputs` / `lines` in your config |
-| Bands of stale pixels while moving | dropped DDP packets — get off Wi-Fi |
+| Bands of stale pixels while moving | dropped DDP packets: get off Wi-Fi |
 | Far end of a run dims to red | power injection, not a data problem |

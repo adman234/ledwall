@@ -5,7 +5,7 @@ wall on a rollable 4 ft × 8 ft substrate.
 
 ---
 
-## 1. The pitch problem — read this before ordering strip
+## 1. The pitch problem: read this before ordering strip
 
 A 4 ft × 8 ft sheet is 1219 × 2438 mm. A 50 × 100 grid has the same 1:2 ratio,
 so *square* pixels filling the sheet exactly would need a pitch of
@@ -19,7 +19,7 @@ strip. Here is what each stocked density actually gives you:
 
 | Density | Pitch | 100 px along a row | 50 rows, square pixels |
 |--------:|------:|-------------------:|-----------------------:|
-| 30/m  | 33.3 mm | 3333 mm (10.9 ft) — longer than the sheet | 1667 mm (65.6") |
+| 30/m  | 33.3 mm | 3333 mm (10.9 ft): longer than the sheet | 1667 mm (65.6") |
 | 60/m  | 16.7 mm | 1667 mm (65.6") | 833 mm (32.8") |
 | 96/m  | 10.4 mm | 1042 mm (41.0") | 521 mm (20.5") |
 | 144/m | 6.9 mm  | 694 mm (27.3")  | 347 mm (13.7") |
@@ -33,25 +33,25 @@ strip. Here is what each stocked density actually gives you:
 | **C** | 30/m, rows on 33.3 mm centres | 36 × 73 | 1200 × 2433 mm (full sheet) | 2,628 | `1.0` |
 | **D** | 60/m filling the sheet | 73 × 146 | full sheet | 10,658 | `1.0` |
 
-* **A** — square pixels, exactly the grid you asked for. The lit area is
+* **A**: square pixels, exactly the grid you asked for. The lit area is
   smaller than the sheet: centre it and you get a 7.6" border down each side
   and 15.2" at each end, or trim the substrate to about 36 × 70" and save the
   weight. Simplest to wire and to reason about.
-* **B** — *recommended if you want it to feel like a 4 × 8 wall.* Same 5,000
+* **B**: *recommended if you want it to feel like a 4 × 8 wall.* Same 5,000
   pixels and the same strip, but the rows are spread out to fill the full 4 ft
   width. Pixels end up taller than they are wide, so set
-  `grid.pixel_aspect: 0.683` and ledwall crops the camera to match — people
+  `grid.pixel_aspect: 0.683` and ledwall crops the camera to match: people
   come out correctly proportioned rather than squashed. The leftover 30" of
   the 8 ft length is a convenient home for the roller core, PSUs and
   controllers.
-* **C** — if you would rather fill the sheet than hit 50 × 100. Half the
+* **C**: if you would rather fill the sheet than hit 50 × 100. Half the
   pixels, half the power, half the data, much easier first build. Set
   `grid: {width: 73, height: 36}`.
-* **D** — don't. 10,658 RGBW pixels is ~2.6 kW theoretical and 42 Mbit/s of
+* **D**: don't. 10,658 RGBW pixels is ~2.6 kW theoretical and 42 Mbit/s of
   DDP at 30 fps.
 
 Everything in the software is resolution-agnostic, so this is purely a
-hardware decision — change `grid:` and `wiring:` and the rest follows.
+hardware decision: change `grid:` and `wiring:` and the rest follows.
 
 ---
 
@@ -69,7 +69,7 @@ Why 12 V rather than the 5 V SK6812:
 
 ⚠️ **Check before you buy:** some 12 V RGBW strips control LEDs in groups of
 three. A "60/m" strip like that gives you 20 *controllable* pixels per metre,
-not 60. Confirm with the seller that it is individually addressable —
+not 60. Confirm with the seller that it is individually addressable:
 per-pixel cut marks, not one cut mark every three LEDs.
 
 Quantity for options A/B: 5,000 px ÷ 60 per m = **83.4 m**, so order ~90 m
@@ -89,7 +89,7 @@ Per LED at full white, all four channels: 12 V RGBW 60/m is typically rated
 | Typical person-mask content (~25 % of pixels lit) | ~105 W | ~9 A |
 
 **Do not size the supply for 1,200 W.** Size it for the cap you actually
-enforce, and then enforce it — in WLED's Automatic Brightness Limiter *and* in
+enforce, and then enforce it: in WLED's Automatic Brightness Limiter *and* in
 `output.brightness`.
 
 Recommended: **2 × 12 V 350 W (29 A)** supplies, one per controller zone
@@ -105,7 +105,7 @@ group, giving 700 W total. That runs the 35 % cap with real headroom.
 * Split the bus into the same 8 zones as the data outputs (~625 px each).
   Each zone can draw up to 12.5 A unclamped → **14 AWG feed and a 15 A fuse
   per zone.** Fuse at the supply, not at the strip.
-* Tie **all grounds together** — every PSU, every controller, the Pi. Shared
+* Tie **all grounds together**: every PSU, every controller, the Pi. Shared
   ground is what makes the data signal work.
 * Never power the strip from the Pi or the ESP32.
 
@@ -126,7 +126,7 @@ WLED on an ESP32 drives its outputs in parallel, so the ceiling is set by the
 *longest* output, not the total. **625 pixels per output** is the number that
 makes 30 fps comfortable.
 
-That means 8 outputs — either 2 × 4-output controllers (the shipped config) or
+That means 8 outputs: either 2 × 4-output controllers (the shipped config) or
 one 8-output board.
 
 ### Network
@@ -140,7 +140,7 @@ one 8-output board.
 **Use Ethernet, not Wi-Fi.** An ESP32 on Wi-Fi drops packets at this rate, and
 a dropped DDP packet is a visible band of stale pixels for that frame. Pick
 controllers with an Ethernet port (the QuinLED Dig-Octa / Dig-Quad boards with
-the Ethernet option are the usual choice; several Gledopto units have it too —
+the Ethernet option are the usual choice; several Gledopto units have it too:
 check the specific model, as the Wi-Fi-only variants look identical).
 
 The Pi 3B+ has 100 Mbit-class networking shared with the USB bus. 4.8 Mbit/s
@@ -168,7 +168,7 @@ edge and every strip bends the correct way.
   bridges. Stagger jumper positions between adjacent rows so you do not build
   a stiff ridge down one edge that fights the roll. Cover each joint with
   adhesive-lined heatshrink or a bead of neutral-cure silicone.
-* **Roll it lit-side out** — the strips are then on the outside of the curve
+* **Roll it lit-side out**: the strips are then on the outside of the curve
   in tension rather than compressed and buckling.
 
 ### Diffusion
@@ -181,7 +181,7 @@ practicality:
    like anyway. Simplest, and it rolls.
 2. A **separate** rolled diffuser (white ripstop or PEVA shower curtain) hung
    on standoffs in front when deployed.
-3. Rigid diffuser panels — good-looking, but you have given up on rolling.
+3. Rigid diffuser panels: good-looking, but you have given up on rolling.
 
 ---
 
@@ -189,7 +189,7 @@ practicality:
 
 Any UVC webcam. Mount it centred on the wall facing the viewer, ideally at
 head height; a wide-FOV lens helps in a small room. Prefer a camera that
-supports MJPG at 640 × 480 — on a Pi 3B+ raw YUYV eats both USB bandwidth and
+supports MJPG at 640 × 480: on a Pi 3B+ raw YUYV eats both USB bandwidth and
 CPU (`camera.fourcc: MJPG`, which is the default).
 
 If the wall is a mirror-image installation (viewer stands in front of it),
@@ -201,7 +201,7 @@ leave `camera.mirror: true` so moving left moves the image left.
 
 | Item | Qty | Notes |
 |------|----:|-------|
-| WS2814 12 V RGBW 60/m strip | ~90 m | individually addressable — verify |
+| WS2814 12 V RGBW 60/m strip | ~90 m | individually addressable: verify |
 | 12 V 350 W PSU | 2 | 29 A each |
 | 4-output Ethernet WLED controller | 2 | or 1 × 8-output |
 | Raspberry Pi 3B+ (64-bit Pi OS) | 1 | + 16 GB+ card, 2.5 A supply |
@@ -211,7 +211,7 @@ leave `camera.mirror: true` so moving left moves the image left.
 | Inline fuse holders + 15 A fuses | 8 | one per zone |
 | 4 × 8 ft flexible substrate | 1 | banner PVC / EVA foam |
 | 150 mm tube | 1 | roller core |
-| 3M VHB tape, zip ties, heatshrink | — | |
+| 3M VHB tape, zip ties, heatshrink | - | |
 | Network switch + cable | 1 | Pi and both controllers wired |
 
 ---
@@ -222,7 +222,7 @@ leave `camera.mirror: true` so moving left moves the image left.
 2. Build **one output** (6–7 rows) and run `ledwall map --by line` on it.
 3. Only then commit to the full wall.
 4. Solder every joint on a bench, not on the hanging sheet.
-5. Run `ledwall map --by output` after each output is added — catching a
+5. Run `ledwall map --by output` after each output is added: catching a
    reversed serpentine at output 3 is cheap, at output 8 it is not.
 
 Bad solder joints are the number one failure in builds like this, and a

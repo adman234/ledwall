@@ -8,8 +8,11 @@ and that silhouette is painted onto the wall in colour at 30 fps. Built for a
 **50 × 100 (5,000 pixel) RGBW wall on a rollable 4 × 8 ft sheet**, but the
 grid size, wiring order and controller layout are all config.
 
-Everything runs on the Pi with no screen attached — there is no OpenCV preview
+Everything runs on the Pi with no screen attached. There is no OpenCV preview
 window, just a web page you open from your laptop.
+
+Inspired by Chris Maher's 50 × 50 grid build; this is a scaled-up, Pi-hosted,
+headless take on the same idea.
 
 ```
 webcam ──► Pi 3B+ ──────────────────────────────► WLED controllers ──► 5,000 RGBW pixels
@@ -25,6 +28,7 @@ webcam ──► Pi 3B+ ──────────────────�
 | [docs/BUILD.md](docs/BUILD.md) | Physical build: **pitch maths, strip choice, power budget, wiring, how to make it roll** |
 | [docs/WLED.md](docs/WLED.md) | Per-controller WLED configuration and how to verify it |
 | [docs/TUNING.md](docs/TUNING.md) | Making a Pi 3B+ hold 30 fps |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | Project status, design decisions, verified facts and open items |
 
 **Read [docs/BUILD.md §1](docs/BUILD.md#1-the-pitch-problem--read-this-before-ordering-strip) before you order strip.** A 50 × 100 grid
 filling a 4 × 8 sheet needs a 24.4 mm pitch (~41 LEDs/m), which does not exist.
@@ -78,6 +82,7 @@ python3 -m venv venv && ./venv/bin/pip install -e '.[dev]'
 | `ledwall bench [--segment]` | Measures render, wiring and model speed on *this* machine. |
 | `ledwall init [path]` | Writes a starter config. |
 | `ledwall cameras` | Lists video devices that actually deliver frames. |
+| `ledwall palettes` | Lists the colour palette names. |
 
 `map` and `test` are the ones that save you. A 5,000-pixel wall will have a
 reversed serpentine or a swapped output somewhere, and finding it by staring
@@ -85,7 +90,7 @@ at a person-shaped blob is miserable.
 
 ## Configuration
 
-One YAML file drives everything — see
+One YAML file drives everything. See
 [`config/wall-50x100.yaml`](config/wall-50x100.yaml) for the annotated
 default. The parts that matter:
 
@@ -111,7 +116,7 @@ wiring:
 The config is validated on load: overlapping controllers, unassigned strip
 runs, output splits that don't add up, and unknown keys are all rejected with
 a message naming the problem. The resulting map is then checked to be exactly
-one-to-one — every grid pixel driving exactly one LED — before anything is
+one-to-one (every grid pixel driving exactly one LED) before anything is
 sent.
 
 `source.kind` picks what drives the mask: `person` (segmentation), `motion`
@@ -125,7 +130,7 @@ numpy gather array: `take[i]` is the flat grid index feeding LED *i*. Sending
 a frame is then one fancy-index per controller, which is why the mapping costs
 ~0.1 ms for 5,000 pixels instead of a Python loop.
 
-**DDP** (`ddp.py`) speaks the wire format WLED actually parses — 10-byte
+**DDP** (`ddp.py`) speaks the wire format WLED actually parses: 10-byte
 header, `0x1B` for RGBW, offsets in channels, payloads capped at 1440 bytes,
 and the push flag set only on a frame's final packet so WLED renders once per
 frame rather than seven times. Verified against WLED's `handleDDPPacket`.
@@ -135,7 +140,7 @@ frame rather than seven times. Verified against WLED's `handleDDPPacket`.
 keeps hues and is far more efficient than making white from three coloured
 dies), then applies brightness and gamma last.
 
-**Rates** are decoupled — capture, inference and output all run at their own
+**Rates** are decoupled: capture, inference and output all run at their own
 speed. See [docs/TUNING.md](docs/TUNING.md).
 
 ## Status
@@ -145,7 +150,7 @@ and web API are covered by tests, including an end-to-end test that runs the
 pipeline against a fake WLED receiver which reassembles DDP frames the way
 WLED does and asserts the right physical LED lights up.
 
-The camera and segmentation backends are **not** hardware-tested — there was
+The camera and segmentation backends are **not** hardware-tested. There was
 no camera or Pi in the loop while writing this. `ledwall doctor` and
 `ledwall bench --segment` exist to tell you quickly whether they work on
 yours.
